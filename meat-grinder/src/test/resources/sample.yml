@@ -1,0 +1,197 @@
+!<flow>
+fullName: "AFS_PEGASE_to_Collective_v1.pub:callSMQS14LWithPivot"
+packageName: "AFS_PEGASE_to_Collective_v1"
+audit:
+  includePipeline: "ON_ERROR_ONLY"
+rootStep: !<CompositeStep>
+  nodes:
+  - !<SEQUENCE>
+    comment: "Main"
+    nodes:
+    - !<SEQUENCE>
+      comment: "Try"
+      nodes:
+      - !<INVOKE>
+        serviceName: "AFS_PEGASE_to_Collective_v1.priv:iDataAddPrefixToFieldName"
+        input: !<MAP>
+          nodes:
+          - !<Copy>
+            from: "/Person"
+            to: "/inDoc"
+          - !<SetValue>
+            to: "/strPrefix"
+            value: "MQS14-"
+        output: !<MAP>
+          nodes:
+          - !<Copy>
+            from: "/outDoc"
+            to: "/outDoc"
+          - !<Drop>
+            path: "/inDoc"
+          - !<Drop>
+            path: "/strPrefix"
+          - !<Drop>
+            path: "/Person"
+      - !<BRANCH>
+        nodes:
+        - !<SEQUENCE>
+          label: "functionCode = '01' || functionCode = '03'"
+          nodes:
+          - !<INVOKE>
+            serviceName: "AFS_PEGASE_to_Collective_v1.priv:callAdpSMQS14L"
+            input: !<MAP>
+              nodes:
+              - !<Copy>
+                from: "/codeUser"
+                to: "/MQS14-ENTREE/MQS14-C-USER"
+              - !<Copy>
+                from: "/codeSiret"
+                to: "/MQS14-ENTREE/MQS14-C-SIRET"
+              - !<Copy>
+                from: "/customerNumber"
+                to: "/MQS14-ENTREE/MQS14-NO-CLI"
+              - !<Copy>
+                from: "/outDoc"
+                to: "/MQS14-ENTREE/MQS14-CONTROLE-ASSURE"
+              - !<Copy>
+                from: "/functionCode"
+                to: "/MQS14-ENTREE/MQS14-CD-FONC"
+            output: !<MAP>
+              nodes:
+              - !<Drop>
+                path: "/codeSiret"
+              - !<Drop>
+                path: "/customerNumber"
+              - !<Drop>
+                path: "/outDoc"
+              - !<Drop>
+                path: "/codeUser"
+              - !<Drop>
+                path: "/functionCode"
+              - !<Copy>
+                from: "/MQS14-CODE-ERREUR"
+                to: "/MQS14-CODE-ERREUR"
+              - !<Copy>
+                from: "/MQS14-NO-CLI"
+                to: "/MQS14-NO-CLI"
+              - !<Drop>
+                path: "/MQS14-ENTREE"
+          exitOn: "FAILURE"
+        - !<SEQUENCE>
+          label: "functionCode = '02' || functionCode = '04'"
+          nodes:
+          - !<INVOKE>
+            serviceName: "AFS_PEGASE_to_Collective_v1.priv:iDataAddPrefixToFieldName"
+            input: !<MAP>
+              nodes:
+              - !<SetValue>
+                to: "/strSuffix"
+                value: "-B"
+              - !<Copy>
+                from: "/outDoc"
+                to: "/inDoc"
+            output: !<MAP>
+              nodes:
+              - !<Copy>
+                from: "/outDoc"
+                to: "/outDoc"
+              - !<Drop>
+                path: "/inDoc"
+              - !<Drop>
+                path: "/strPrefix"
+              - !<Drop>
+                path: "/strSuffix"
+          - !<INVOKE>
+            serviceName: "AFS_PEGASE_to_Collective_v1.priv:callAdpSMQS14L"
+            input: !<MAP>
+              nodes:
+              - !<Copy>
+                from: "/codeUser"
+                to: "/MQS14-ENTREE/MQS14-C-USER"
+              - !<Copy>
+                from: "/codeSiret"
+                to: "/MQS14-ENTREE/MQS14-C-SIRET"
+              - !<Copy>
+                from: "/customerNumber"
+                to: "/MQS14-ENTREE/MQS14-NO-CLI"
+              - !<Copy>
+                from: "/functionCode"
+                to: "/MQS14-ENTREE/MQS14-CD-FONC"
+              - !<Copy>
+                from: "/outDoc"
+                to: "/MQS14-ENTREE/MQS14-CONTROLE-BENEF/MQS14-TAB-BENEF-B"
+            output: !<MAP>
+              nodes:
+              - !<Drop>
+                path: "/codeSiret"
+              - !<Drop>
+                path: "/customerNumber"
+              - !<Drop>
+                path: "/outDoc"
+              - !<Drop>
+                path: "/codeUser"
+              - !<Drop>
+                path: "/functionCode"
+              - !<Drop>
+                path: "/MQS14-ENTREE"
+              - !<Copy>
+                from: "/MQS14-CODE-ERREUR"
+                to: "/MQS14-CODE-ERREUR"
+              - !<Copy>
+                from: "/MQS14-NO-CLI"
+                to: "/MQS14-NO-CLI"
+          exitOn: "FAILURE"
+        evaluateLabels: true
+      - !<INVOKE>
+        serviceName: "AFS_PEGASE_to_Collective_v1.priv.exception:checkStatus"
+        output: !<MAP> {}
+      - !<SEQUENCE>
+        comment: "Supervision - SUCCESS"
+        nodes:
+        - !<INVOKE>
+          serviceName: "AIFLogger.header.pub:sendLog"
+          input: !<MAP>
+            nodes:
+            - !<Copy>
+              label: "Link"
+              from: "/AXAContextHeader"
+              to: "/AXAContextHeader"
+            - !<SetValue>
+              to: "/description"
+              value: "succeeded"
+            - !<SetValue>
+              to: "/code"
+              value: "OK"
+            - !<SetValue>
+              to: "/level"
+              value: "MESSAGE"
+          output: !<MAP>
+            nodes:
+            - !<Drop>
+              path: "/AXAContextHeader"
+            - !<Drop>
+              path: "/description"
+        exitOn: "FAILURE"
+      exitOn: "FAILURE"
+    - !<SEQUENCE>
+      comment: "Catch"
+      nodes:
+      - !<INVOKE>
+        serviceName: "pub.flow:getLastError"
+        input: !<MAP> {}
+        output: !<MAP>
+          nodes:
+          - !<Copy>
+            from: "/lastError"
+            to: "/lastError"
+      - !<EXIT>
+        failureMessage: "%lastError/error%"
+        signalFailure: true
+        from: "FLOW"
+      exitOn: "DONE"
+    exitOn: "SUCCESS"
+  - !<MAP>
+    comment: "clear"
+    nodes:
+    - !<Drop>
+      path: "/MQS14-ENTREE"

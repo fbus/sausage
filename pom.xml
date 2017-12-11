@@ -1,0 +1,149 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.sausage</groupId>
+	<artifactId>sausage-mama</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>sausage-mama</name>
+	<packaging>pom</packaging>
+
+
+	<modules>
+		<module>wurst-model</module>
+		<module>wurst-serializer</module>
+		<module>meat-grinder</module>
+	</modules>
+
+
+	<dependencyManagement>
+		<dependencies>
+
+			<dependency>
+				<groupId>log4j</groupId>
+				<artifactId>log4j</artifactId>
+				<version>1.2.12</version>
+			</dependency>
+			<dependency>
+				<groupId>oro</groupId>
+				<artifactId>oro</artifactId>
+				<version>2.0.8</version>
+			</dependency>
+
+
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-databind</artifactId>
+				<version>2.9.0</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.dataformat</groupId>
+				<artifactId>jackson-dataformat-yaml</artifactId>
+				<version>2.9.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.wm</groupId>
+				<artifactId>wm-isclient</artifactId>
+				<version>${wm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.wm</groupId>
+				<artifactId>wm-isproxy</artifactId>
+				<version>${wm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.wm</groupId>
+				<artifactId>wm-isserver</artifactId>
+				<version>${wm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.wm</groupId>
+				<artifactId>wm-adapter-runtime</artifactId>
+				<version>${wm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.wm</groupId>
+				<artifactId>com.softwareag.g11n</artifactId>
+				<version>${wm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.wm</groupId>
+				<artifactId>deployer-api</artifactId>
+				<version>${wm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.wm</groupId>
+				<artifactId>wm-scg-audit</artifactId>
+				<version>${wm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.wm</groupId>
+				<artifactId>wm-scg-core.jar</artifactId>
+				<version>${wm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.wm</groupId>
+				<artifactId>sin-common</artifactId>
+				<version>${wm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.wm</groupId>
+				<artifactId>jnpserver</artifactId>
+				<version>${wm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.wm</groupId>
+				<artifactId>wm-directory</artifactId>
+				<version>${wm.version}</version>
+			</dependency>
+
+
+			<dependency>
+				<groupId>javax</groupId>
+				<artifactId>javaee-api</artifactId>
+				<version>7.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.ibm.icu</groupId>
+				<artifactId>icu4j</artifactId>
+				<version>4.8.1.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>commons-lang</groupId>
+				<artifactId>commons-lang</artifactId>
+				<version>2.6</version>
+			</dependency>
+
+
+
+
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.2</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<properties>
+		<wm.version>8.2.2.0</wm.version>
+	</properties>
+</project>
