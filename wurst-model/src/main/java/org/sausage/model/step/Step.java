@@ -8,4 +8,5 @@ public class Step {
     public String label;
     public boolean disable;
     public CompositeStep parent; // <- might not really be needed
+	public String id;
 }

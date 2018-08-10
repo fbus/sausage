@@ -1,21 +1,25 @@
 package org.sausage.grinder;
 
 import org.apache.commons.lang.StringUtils;
+import org.sausage.grinder.util.RecordDiffer;
+import org.sausage.grinder.util.ValueGrinder;
+import org.sausage.model.document.CompositeType;
 import org.sausage.model.step.Branch;
 import org.sausage.model.step.CompositeStep;
 import org.sausage.model.step.Exit;
+import org.sausage.model.step.Exit.FromEnum;
 import org.sausage.model.step.Invoke;
 import org.sausage.model.step.Loop;
 import org.sausage.model.step.MapStep;
 import org.sausage.model.step.Repeat;
 import org.sausage.model.step.Sequence;
 import org.sausage.model.step.Step;
-import org.sausage.model.step.Exit.FromEnum;
 import org.sausage.model.step.map.Copy;
 import org.sausage.model.step.map.Drop;
 import org.sausage.model.step.map.SetValue;
 import org.sausage.model.step.map.Transformer;
 
+import com.wm.app.b2b.server.ns.Namespace;
 import com.wm.lang.flow.FlowBranch;
 import com.wm.lang.flow.FlowElement;
 import com.wm.lang.flow.FlowExit;
@@ -28,6 +32,7 @@ import com.wm.lang.flow.FlowMapInvoke;
 import com.wm.lang.flow.FlowMapSet;
 import com.wm.lang.flow.FlowRetry;
 import com.wm.lang.flow.FlowSequence;
+import com.wm.lang.ns.NSRecord;
 
 public class FlowGrinder {
 
@@ -61,8 +66,9 @@ public class FlowGrinder {
             // TODO scope ?
         }
         
-        protected String getStringProperty(FlowElement elt, String name) {
-            return (String) elt.getValues().get(name);
+        @SuppressWarnings("unchecked")
+		protected <T> T getStringProperty(FlowElement elt, String name) {
+            return (T) elt.getValues().get(name);
         }
     }
     
@@ -73,6 +79,14 @@ public class FlowGrinder {
         public MapStep convert(FlowMap in) {
             MapStep result = new MapStep();
             copyCommonAttributes(in, result);
+            NSRecord source = in.getSource(Namespace.current());
+            NSRecord target = in.getTarget(Namespace.current());
+            CompositeType before = source == null ? null : TypeGrinder.convert(source);
+            CompositeType after = target == null ? null : TypeGrinder.convert(target);
+
+            if(before != null && after != null) {
+           		result.pipelineChanges = RecordDiffer.getChanges(before, after);
+            }
             
             MapConverter.convert(in, result);
             return result;
@@ -106,7 +120,7 @@ public class FlowGrinder {
             result.label = null; // can't put a label on this, and WM uselessly put "Setter". 
             
             result.to = in.getParsedPath().getPathDisplayString();
-            result.value = in.getInput();
+			result.value = ValueGrinder.convert(in.getInput());
             return result;
         }
         

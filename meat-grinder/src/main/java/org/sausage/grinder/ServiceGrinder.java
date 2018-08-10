@@ -2,16 +2,17 @@ package org.sausage.grinder;
 
 import java.net.URL;
 
+import org.sausage.grinder.util.SimpleIDataMap;
+import org.sausage.model.adapter.AdapterService;
 import org.sausage.model.document.CompositeType;
-import org.sausage.model.service.ACLs;
-import org.sausage.model.service.AdapterService;
+import org.sausage.model.service.AccessControlList;
 import org.sausage.model.service.Audit;
 import org.sausage.model.service.Audit.IncludePipeline;
 import org.sausage.model.service.CacheBehavior;
 import org.sausage.model.service.FlowService;
 import org.sausage.model.service.ISService;
+import org.sausage.model.service.Signature;
 
-import com.softwareag.util.IDataMap;
 import com.wm.app.b2b.server.ACLManager;
 import com.wm.app.b2b.server.BaseService;
 import com.wm.app.b2b.server.FlowSvcImpl;
@@ -19,6 +20,7 @@ import com.wm.app.b2b.server.JavaService;
 import com.wm.app.b2b.server.Package;
 import com.wm.app.b2b.server.PackageFS;
 import com.wm.app.b2b.server.PackageStore;
+import com.wm.app.b2b.server.SpecService;
 import com.wm.data.IData;
 import com.wm.lang.ns.AuditSettings;
 import com.wm.lang.ns.NSRecord;
@@ -36,27 +38,29 @@ public class ServiceGrinder {
 
             FlowService flowService = new FlowService();
             service = flowService;
-
-            FlowGrinder.addChrildren(flowService.rootStep, se.getFlowRoot().getNodes());
+            if(se.getFlowRoot() != null) {
+            	FlowGrinder.addChrildren(flowService.rootStep, se.getFlowRoot().getNodes());
+            }
+            
         } else if (baseSvc instanceof JavaService) {
             JavaService javaSvc = (JavaService) baseSvc;
             org.sausage.model.service.JavaService javaService = new org.sausage.model.service.JavaService();
             service = javaService;
-            PackageFS store = (PackageFS) ((Package) javaSvc.getPackage()).getStore();
-            Values fragIData = (Values) store.getFromNode(baseSvc.getNSName(), PackageStore.JAV_FILE);
-
-            Object value = fragIData.get("body");
-            if (value != null) {
-                String source = Base64.decodeUTF8(value.toString());
-                javaService.methodSource = source;
+            if(javaSvc.hasFrag()) {
+            	javaService.methodSource = getJavaFragSource(baseSvc, javaSvc);
+            } else {
+            	javaService.methodName = javaSvc.getClassName() + "." + javaSvc.getMethodName();
             }
         } else if (baseSvc instanceof AdapterServiceNode) {
             AdapterServiceNode adapterService = (AdapterServiceNode) baseSvc;
             AdapterService adp = new AdapterService();
             IData metadata = adapterService.getMetadataPropertySettings();
-            adp.metadata = new IDataMap(metadata);
+            adp.metadata = new SimpleIDataMap(metadata);
 
             service = adp;
+        } else if (baseSvc instanceof SpecService) {
+        	service = new ISService();
+        	// TODO ? 
         } else {
 
             Class<?> c = baseSvc.getClass();
@@ -64,14 +68,13 @@ public class ServiceGrinder {
             throw new IllegalArgumentException("unhandled type : " + baseSvc + " - " + baseSvc.getClass() + " " + resource);
         }
 
-        service.fullName = baseSvc.getNSName().getFullName();
-        service.packageName = baseSvc.getPackage().getName();
+        service.setName(baseSvc.getNSName().getFullName());
+        service.setPackageName(baseSvc.getPackage().getName());
+        
         service.audit = new Audit();
-
-        NSRecord output = baseSvc.getSignature().getOutput();
-        NSRecord input = baseSvc.getSignature().getInput();
-        CompositeType inputSignature = TypeGrinder.convert(input);
-        CompositeType outputSignature = TypeGrinder.convert(output);
+        
+        service.signature = getSignature(baseSvc);
+        
         service.cacheBehavior = getCacheBehavior(baseSvc);
         service.acl = getACLs(baseSvc);
 
@@ -80,8 +83,36 @@ public class ServiceGrinder {
         return service;
     }
 
-    private static ACLs getACLs(BaseService se) {
-        final ACLs acls;
+	private static String getJavaFragSource(BaseService baseSvc, JavaService javaSvc) {
+		PackageFS store = (PackageFS) ((Package) javaSvc.getPackage()).getStore();
+		Values fragIData = (Values) store.getFromNode(baseSvc.getNSName(), PackageStore.JAV_FILE);
+		String source = null;
+		Object value = fragIData == null ? null : fragIData.get("body");
+		if (value != null) {
+			source = Base64.decodeUTF8(value.toString());
+		} else {
+			System.out.println("" + baseSvc.getNSName());
+		}
+		return source;
+	}
+
+	private static Signature getSignature(BaseService baseSvc) {
+		
+		Signature signature = new Signature();
+		
+		NSRecord output = null;
+		NSRecord input = null;
+        if(baseSvc.getSignature() != null) {
+        	output = baseSvc.getSignature().getOutput();
+        	input = baseSvc.getSignature().getInput();
+        }
+        signature.input = input == null ? new CompositeType() : TypeGrinder.convert(input);
+        signature.output = output == null ? new CompositeType() : TypeGrinder.convert(output);
+        return signature;
+	}
+
+    private static AccessControlList getACLs(BaseService se) {
+        final AccessControlList acls;
         String readAcl = ACLManager.defaultSystemACL.equals(se.getReadAclGroup()) ? null : se.getReadAclGroup();
         String writeAcl = ACLManager.defaultSystemACL.equals(se.getWriteAclGroup()) ? null : se.getWriteAclGroup();
         String execAcl = ACLManager.defaultSystemACL.equals(se.getAclGroup()) ? null : se.getAclGroup();
@@ -89,7 +120,7 @@ public class ServiceGrinder {
         if (readAcl == null && writeAcl == null && execAcl == null) {
             acls = null;
         } else {
-            acls = new ACLs();
+            acls = new AccessControlList();
             acls.readAcl = readAcl;
             acls.writeAcl = writeAcl;
             acls.execAcl = execAcl;

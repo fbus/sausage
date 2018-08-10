@@ -12,17 +12,29 @@
 		<module>wurst-model</module>
 		<module>wurst-serializer</module>
 		<module>meat-grinder</module>
+		<module>sausage-stuffer</module>
 	</modules>
 
 
 	<dependencyManagement>
 		<dependencies>
 
+<!-- 		TODO check if it's a good idea.
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>1.1.12.RELEASE</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency> -->
+			
 			<dependency>
 				<groupId>log4j</groupId>
 				<artifactId>log4j</artifactId>
 				<version>1.2.12</version>
 			</dependency>
+			
+		
 			<dependency>
 				<groupId>oro</groupId>
 				<artifactId>oro</artifactId>
@@ -96,6 +108,11 @@
 				<artifactId>wm-directory</artifactId>
 				<version>${wm.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>com.wm</groupId>
+				<artifactId>wm-lwq</artifactId>
+				<version>${wm.version}</version>
+			</dependency>
 
 
 			<dependency>
@@ -137,6 +154,7 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.2</version>
 				<configuration>
+					<!-- yes. That's old. But needed to run inside a 8.2 Integration Server  -->
 					<source>1.6</source>
 					<target>1.6</target>
 				</configuration>

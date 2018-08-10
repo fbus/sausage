@@ -19,9 +19,19 @@
 
 
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-logging</artifactId>
+			<version>1.1.12.RELEASE</version>
+			<scope>runtime</scope>
 		</dependency>
+		
+		<dependency>
+		    <groupId>de.danielbechler</groupId>
+		    <artifactId>java-object-diff</artifactId>
+		    <version>0.95</version>
+		</dependency>
+		
+		
 		<dependency>
 			<groupId>oro</groupId>
 			<artifactId>oro</artifactId>
@@ -42,61 +52,6 @@
 		<dependency>
 			<groupId>com.wm</groupId>
 			<artifactId>wm-adapter-runtime</artifactId>
-		</dependency>
-
-
-
-		<dependency>
-			<groupId>org.sausage</groupId>
-			<artifactId>wurst-serializer</artifactId>
-			<version>${parent.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>com.wm</groupId>
-			<artifactId>com.softwareag.g11n</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.wm</groupId>
-			<artifactId>deployer-api</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.wm</groupId>
-			<artifactId>wm-scg-audit</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.wm</groupId>
-			<artifactId>wm-scg-core.jar</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.wm</groupId>
-			<artifactId>sin-common</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.wm</groupId>
-			<artifactId>jnpserver</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.wm</groupId>
-			<artifactId>wm-directory</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax</groupId>
-			<artifactId>javaee-api</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>com.ibm.icu</groupId>
-			<artifactId>icu4j</artifactId>
 		</dependency>
 
 		<dependency>

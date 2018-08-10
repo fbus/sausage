@@ -1,6 +1,6 @@
 package org.sausage.model.service;
 
-public class ACLs {
+public class AccessControlList {
 
     public String readAcl;
     public String writeAcl;

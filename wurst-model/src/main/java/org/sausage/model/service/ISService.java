@@ -1,9 +1,8 @@
 package org.sausage.model.service;
 
-public class ISService {
+import org.sausage.model.AbstractAsset;
 
-    public String fullName;
-    public String packageName;
+public class ISService extends AbstractAsset {
     
     public Audit audit;
     
@@ -12,5 +11,7 @@ public class ISService {
      */
     public CacheBehavior cacheBehavior;
 
-    public ACLs acl;
+    public AccessControlList acl;
+
+	public Signature signature;
 }

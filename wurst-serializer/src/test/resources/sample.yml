@@ -1,5 +1,5 @@
 !<flow>
-fullName: "AFS_PEGASE_to_Collective_v1.pub:callSMQS14LWithPivot"
+name: "AFS_PEGASE_to_Collective_v1.pub:callSMQS14LWithPivot"
 packageName: "AFS_PEGASE_to_Collective_v1"
 audit:
   includePipeline: "ON_ERROR_ONLY"

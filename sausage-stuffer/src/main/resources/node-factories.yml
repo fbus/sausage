@@ -1,0 +1,17 @@
+---
+flow: "com.wm.app.b2b.server.FlowServiceFactory"
+java: "com.wm.app.b2b.server.JavaServiceFactory"
+spec: "com.wm.app.b2b.server.SpecServiceFactory"
+record: "com.wm.app.b2b.server.NSRecordFactory"
+schema: "com.wm.app.b2b.server.NSSchemaFactory"
+webMethods/trigger: "com.wm.app.b2b.server.TriggerFactory"
+webServiceDescriptor: "com.wm.app.b2b.server.NSWSDescriptorFactory"
+# comment the following lines if you have no plugins.
+AdapterService: "com.wm.pkg.art.ns.AdapterServiceFactory"
+ConnectionData: "com.wm.pkg.art.ns.ConnectionDataNodeFactory"
+AdapterRuntimeListener: "com.wm.pkg.art.ns.ListenerFactory"
+AdapterRuntimeNotification: "com.wm.pkg.art.ns.NotificationFactory"
+#to investigate...
+#"Document Part Holder": "com.wm.ff.parse.DocumentPartHolderFactory"
+#"Flat File Schema" :com.wm.ff.parse.DocumentFactory
+#xsltservice: com.webmethods.xslt.XSLTServiceFactory

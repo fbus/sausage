@@ -1,6 +1,6 @@
 package org.sausage.serializer.mixin;
 
-import org.sausage.model.service.AdapterService;
+import org.sausage.model.adapter.AdapterService;
 import org.sausage.model.service.FlowService;
 import org.sausage.model.service.JavaService;
 

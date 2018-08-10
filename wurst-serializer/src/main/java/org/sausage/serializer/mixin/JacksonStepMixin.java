@@ -36,7 +36,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @Type(value = SetValue.class, name = "SetValue"),
         @Type(value = Transformer.class, name = "Transformer"),
       })
-@JsonIgnoreProperties({"parent"}) // to avoid recursion
+@JsonIgnoreProperties({"parent", "id"}) // don't put parent to avoid recursion
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class JacksonStepMixin {
+	// TODO voir si @JsonBackReference pourrait éviter d'ignorer "parent".
 }

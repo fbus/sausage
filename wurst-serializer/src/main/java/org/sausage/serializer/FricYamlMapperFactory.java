@@ -1,9 +1,9 @@
 package org.sausage.serializer;
 
+import org.sausage.model.Asset;
 import org.sausage.model.document.Type;
-import org.sausage.model.service.ISService;
 import org.sausage.model.step.Step;
-import org.sausage.serializer.mixin.JacksonServiceMixin;
+import org.sausage.serializer.mixin.JacksonAssetMixin;
 import org.sausage.serializer.mixin.JacksonStepMixin;
 import org.sausage.serializer.mixin.JacksonTypeMixin;
 
@@ -22,7 +22,7 @@ public class FricYamlMapperFactory {
         mapper.setSerializationInclusion(Include.NON_NULL);
         mapper.addMixIn(Step.class, JacksonStepMixin.class);
         mapper.addMixIn(Type.class, JacksonTypeMixin.class);
-        mapper.addMixIn(ISService.class, JacksonServiceMixin.class);
+        mapper.addMixIn(Asset.class, JacksonAssetMixin.class);
         return mapper;
 	}
 }
