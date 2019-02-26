@@ -9,10 +9,9 @@ import org.sausage.model.document.Field;
 import org.sausage.model.service.FlowService;
 import org.sausage.model.service.ISService;
 import org.sausage.model.service.JavaService;
+import org.sausage.offline.util.OfflineInitializer;
 import org.sausage.serializer.FricYamlMapperFactory;
 
-import com.softwareag.util.IDataMap;
-import com.wm.app.b2b.server.ACLManager;
 import com.wm.app.b2b.server.BaseService;
 import com.wm.app.b2b.server.FlowServiceFactory;
 import com.wm.app.b2b.server.FlowSvcImpl;
@@ -21,9 +20,7 @@ import com.wm.app.b2b.server.NSRecordFactory;
 import com.wm.app.b2b.server.NodeFactory;
 import com.wm.app.b2b.server.Package;
 import com.wm.app.b2b.server.PackageFS;
-import com.wm.app.b2b.server.Resources;
 import com.wm.app.b2b.server.Server;
-import com.wm.app.b2b.server.UserManager;
 import com.wm.data.IData;
 import com.wm.lang.ns.NSField;
 import com.wm.lang.ns.NSName;
@@ -37,12 +34,10 @@ public class GrindingTest {
 
 	@BeforeClass
 	public static void init() throws Exception {
-		String root = "C:\\rappatriement\\temp\\testIS";
-		boolean create = false;
-		Resources gResources = new Resources(root, create);
-		Server.setResources(gResources);
-		UserManager.init();
-		ACLManager.init();
+		if (!Server.isRunning()) {
+			String serverRootDir = "C:\\rappatriement\\temp\\testIS";
+			OfflineInitializer.setupWmConstants(serverRootDir);
+		}
 	}
 
 	@Test

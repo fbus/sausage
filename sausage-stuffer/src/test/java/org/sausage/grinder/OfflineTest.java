@@ -13,7 +13,7 @@ import org.sausage.stuffer.MeatProvider;
 import org.sausage.stuffer.OfflineMeatProvider;
 
 import com.wm.app.b2b.server.BaseService;
-import com.wm.app.b2b.server.FlowSvcImpl;
+import com.wm.app.b2b.server.Server;
 import com.wm.lang.ns.NSName;
 import com.wm.lang.ns.NSNode;
 
@@ -22,8 +22,10 @@ public class OfflineTest {
 
 	@BeforeClass
 	public static void init() throws Exception {
-		String serverRootDir = "C:\\rappatriement\\temp\\testIS";
-		OfflineInitializer.setupWmConstants(serverRootDir);
+		if (!Server.isRunning()) {
+			String serverRootDir = "C:\\rappatriement\\temp\\testIS";
+			OfflineInitializer.setupWmConstants(serverRootDir);
+		}
 	}
 	
 	@Test
@@ -36,8 +38,8 @@ public class OfflineTest {
 		
 		NSNode nsNode = meatProvider.getNode(packageName, name);
 		
-		FlowSvcImpl flowSvcImpl = (FlowSvcImpl) nsNode;
-		flowSvcImpl.validate(); // <- will load the flow.xml !!!
+//		FlowSvcImpl flowSvcImpl = (FlowSvcImpl) nsNode;
+//		flowSvcImpl.validate(); // <- will load the flow.xml !!!
 
 		ISService service = ServiceGrinder.convert((BaseService) nsNode);
 		Assert.assertTrue(service instanceof FlowService);

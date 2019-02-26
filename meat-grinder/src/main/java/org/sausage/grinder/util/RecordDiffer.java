@@ -41,17 +41,12 @@ public class RecordDiffer {
 			DiffNode comparison = DIFFER.compare(afterType, beforeType);
 			if(comparison.isUntouched()) {
 				iterator.remove();
-			} else {
-				// aaaarh
-				System.out.println(comparison);
 			}
 		}
 		
 		if(!modifiedFieldMap.isEmpty()) {
 			result.structureModified = asCompositeType(modifiedFieldMap);
 		}
-		
-    	
 		
     	return result;
 	}

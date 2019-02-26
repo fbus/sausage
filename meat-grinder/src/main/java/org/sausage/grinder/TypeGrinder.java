@@ -30,12 +30,11 @@ public class TypeGrinder {
 		final Type type;
 		switch (input.getType()) {
 		case NSField.FIELD_RECORD:
-			type = convert((NSRecord) input);
+			type = convertRecord((NSRecord) input);
 			break;
 		case NSField.FIELD_RECORDREF:
-			DocumentReferenceType docRef = new DocumentReferenceType();
-			NSRecordRef nsRecordRef = (NSRecordRef) input;
-			docRef.ref = nsRecordRef.getTargetName().getFullName();
+		    NSRecordRef nsRecordRef = (NSRecordRef) input;
+            DocumentReferenceType docRef = convertReference(nsRecordRef);
 			type = docRef;
 			break;
 		case NSField.FIELD_STRING:
@@ -62,7 +61,13 @@ public class TypeGrinder {
 		return result;
 	}
 
-	public static CompositeType convert(NSRecord input) {
+    public static DocumentReferenceType convertReference(NSRecordRef nsRecordRef) {
+        DocumentReferenceType docRef = new DocumentReferenceType();
+        docRef.ref = nsRecordRef.getTargetName().getFullName();
+        return docRef;
+    }
+
+	public static CompositeType convertRecord(NSRecord input) {
 		CompositeType result = new CompositeType();
 		NSField[] fields = input.getFields();
 		for (NSField nsField : fields) {

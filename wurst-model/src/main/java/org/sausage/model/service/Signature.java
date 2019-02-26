@@ -1,9 +1,9 @@
 package org.sausage.model.service;
 
-import org.sausage.model.document.CompositeType;
+import org.sausage.model.document.Type;
 
 public class Signature {
 
-	public CompositeType input;
-	public CompositeType output;
+	public Type input;
+	public Type output;
 }

@@ -73,7 +73,7 @@ public class OfflineInitializer {
 		try {
 			// https://en.wikipedia.org/wiki/WebMethods_Integration_Server#Release_history
 			EnumHack.unsafelyAddEnumValues(NSWSDescriptor.Version.class, //
-					"_9_0", "_9_5", "_9_6", "_9_7", "_9_8", "_9_9", "_9_10", "_9_12", "_10_0", "_10_1");
+					"_9_0", "_9_5", "_9_6", "_9_7", "_9_8", "_9_9", "_9_10", "_9_12", "_10_0", "_10_1", "_10_1", "_10_3");
 		} catch (Throwable e) {
 			LOG.warn("Failed to hack NSWSDescriptor.Version values :'(", e);
 		}

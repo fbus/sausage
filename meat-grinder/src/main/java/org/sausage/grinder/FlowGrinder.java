@@ -14,8 +14,11 @@ import org.sausage.model.step.MapStep;
 import org.sausage.model.step.Repeat;
 import org.sausage.model.step.Sequence;
 import org.sausage.model.step.Step;
+import org.sausage.model.step.invoke.InputMap;
+import org.sausage.model.step.invoke.OutputMap;
 import org.sausage.model.step.map.Copy;
 import org.sausage.model.step.map.Drop;
+import org.sausage.model.step.map.PipelineChanges;
 import org.sausage.model.step.map.SetValue;
 import org.sausage.model.step.map.Transformer;
 
@@ -79,18 +82,26 @@ public class FlowGrinder {
         public MapStep convert(FlowMap in) {
             MapStep result = new MapStep();
             copyCommonAttributes(in, result);
-            NSRecord source = in.getSource(Namespace.current());
-            NSRecord target = in.getTarget(Namespace.current());
-            CompositeType before = source == null ? null : TypeGrinder.convert(source);
-            CompositeType after = target == null ? null : TypeGrinder.convert(target);
-
-            if(before != null && after != null) {
-           		result.pipelineChanges = RecordDiffer.getChanges(before, after);
-            }
+            
+            inferPipelineChanges(in, result);
             
             MapConverter.convert(in, result);
             return result;
         }
+
+		public static void inferPipelineChanges(FlowMap in, MapStep out) {
+			NSRecord source = in.getSource(Namespace.current());
+            NSRecord target = in.getTarget(Namespace.current());
+            CompositeType before = source == null ? null : TypeGrinder.convertRecord(source);
+            CompositeType after = target == null ? null : TypeGrinder.convertRecord(target);
+
+            if(before != null && after != null) {
+           		PipelineChanges changes = RecordDiffer.getChanges(before, after);
+           		if(changes != null && changes.structureModified != null && changes.added != null) {
+           			out.pipelineChanges = changes;
+           		}
+            }
+		}
         
         public static void convert(FlowMap in, MapStep out) {
             addChrildren(out, in.getNodes());
@@ -104,6 +115,7 @@ public class FlowGrinder {
         public Copy convert(FlowMapCopy in) {
             Copy result = new Copy();
             copyCommonAttributes(in, result);
+            result.label = null; // can't put a label on this, and WM uselessly put "Link". 
             result.from = in.getParsedFrom().getPathDisplayString();
             result.to = in.getParsedTo().getPathDisplayString();
             return result;
@@ -113,16 +125,19 @@ public class FlowGrinder {
     
     public static class MapSetConverter extends BaseFlowElementConverter<FlowMapSet, SetValue> {
         
-        @Override
-        public SetValue convert(FlowMapSet in) {
-            SetValue result = new SetValue();
-            copyCommonAttributes(in, result);
-            result.label = null; // can't put a label on this, and WM uselessly put "Setter". 
-            
-            result.to = in.getParsedPath().getPathDisplayString();
+		@Override
+		public SetValue convert(FlowMapSet in) {
+			SetValue result = new SetValue();
+			copyCommonAttributes(in, result);
+			result.label = null; // can't put a label on this, and WM uselessly put "Setter".
+			
+			result.to = in.getParsedPath().getPathDisplayString();
 			result.value = ValueGrinder.convert(in.getInput());
-            return result;
-        }
+			result.doNotOverwritePipelineValue = !in.isOverwrite();
+			result.performVariableSubstitution = in.isVariables();
+
+			return result;
+		}
         
     }
     
@@ -132,6 +147,7 @@ public class FlowGrinder {
         public Drop convert(FlowMapDelete in) {
             Drop result = new Drop();
             copyCommonAttributes(in, result);
+            result.label = null; // can't put a label on this, and WM uselessly put "Dropper". 
             result.path = in.getParsedPath().getPathDisplayString();
             return result;
         }
@@ -220,13 +236,30 @@ public class FlowGrinder {
         
         public static void convert(FlowInvoke in, Invoke out) {
             out.serviceName = in.getService().getFullName();
+            NSRecord source = null;
+            NSRecord target = null;
             if(in.getInputMap() != null) {
-                out.input = new MapStep();
+                out.input = new InputMap();
+                out.input.parentInvoke = out;
                 MapConverter.convert(in.getInputMap(), out.input);
+                
+                source = in.getInputMap().getSource(Namespace.current());
             }
             if(in.getOutputMap() != null) {
-                out.output = new MapStep();
+                out.output = new OutputMap();
+                out.output.parentInvoke = out;
                 MapConverter.convert(in.getOutputMap(), out.output);
+                
+                target = in.getOutputMap().getTarget(Namespace.current());
+            }
+            CompositeType before = source == null ? null : TypeGrinder.convertRecord(source);
+            CompositeType after = target == null ? null : TypeGrinder.convertRecord(target);
+
+            if(!(out instanceof Transformer) && before != null && after != null) {
+           		PipelineChanges changes = RecordDiffer.getChanges(before, after);
+                if(changes != null && changes.structureModified != null && changes.added != null) {
+                    out.pipelineChanges = changes;
+                }
             }
         }
     }
@@ -237,7 +270,7 @@ public class FlowGrinder {
         public Transformer convert(FlowMapInvoke in) {
             Transformer result = new Transformer();
             copyCommonAttributes(in, result);
-            
+
             InvokeConverter.convert(in, result);
             return result;
         }

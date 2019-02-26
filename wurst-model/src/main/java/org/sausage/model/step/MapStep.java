@@ -4,6 +4,6 @@ import org.sausage.model.step.map.PipelineChanges;
 
 public class MapStep extends CompositeStep {
 
-	public PipelineChanges pipelineChanges;
+    public PipelineChanges pipelineChanges;
 
 }
